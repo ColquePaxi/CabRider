@@ -38,7 +38,7 @@ class _SearchPageState extends State<SearchPage> {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: Icon(Icons.arrow_back)),
+                          child: Icon(Icons.arrow_back_sharp)),
                       Center(
                         child: Text('Set destination',
                             style: TextStyle(

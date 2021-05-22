@@ -167,7 +167,7 @@ class _MainPageState extends State<MainPage> {
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 20,
-                  child: Icon(Icons.menu),
+                  child: Icon(Icons.menu_sharp),
                 ),
               ),
             ),
@@ -237,7 +237,7 @@ class _MainPageState extends State<MainPage> {
                           child: Row(
                             children: [
                               Icon(
-                                Icons.search,
+                                Icons.search_sharp,
                                 color: Colors.blueAccent,
                               ),
                               SizedBox(
