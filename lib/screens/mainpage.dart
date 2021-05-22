@@ -1,4 +1,5 @@
 import 'package:cab_rider/brand_colors.dart';
+import 'package:cab_rider/dataproviders/appdata.dart';
 import 'package:cab_rider/helpers/helpermethods.dart';
 import 'package:cab_rider/styles/styles.dart';
 import 'package:cab_rider/widgets/brand_divider.dart';
@@ -8,6 +9,7 @@ import 'dart:async';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   static const String id = 'mainpage';
@@ -46,7 +48,8 @@ class _MainPageState extends State<MainPage> {
     CameraPosition cp = CameraPosition(target: pos, zoom: 14);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
 
-    String address = await HelperMethods.findCoordinateAddress(position);
+    String address =
+        await HelperMethods.findCoordinateAddress(position, context);
     print(address);
   }
 
@@ -252,7 +255,15 @@ class _MainPageState extends State<MainPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Add home'),
+                            // Foi feito esse teste para ver se o provider está ok
+                            Text(
+                                /*(Provider.of<AppData>(context).pickupAddress !=
+                                    null)
+                                ? Provider.of<AppData>(context)
+                                    .pickupAddress
+                                    .placeName
+                                :*/
+                                'Add Home'),
                             SizedBox(height: 3),
                             Text(
                               'Your residential address',
