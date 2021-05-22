@@ -1,7 +1,9 @@
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
+import 'package:cab_rider/secrets/globalvariables.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cab_rider/helpers/requesthelper.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -34,6 +36,20 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   /// Término - Implamentação do FOCO no campo Destination
+
+  void searchPlace(String placeName) async {
+    if (placeName.length > 1) {
+      String url =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890';
+
+      var response = await RequestHelper.getRequest(url);
+
+      if (response == 'failed') {
+        return;
+      }
+      print(response);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +154,9 @@ class _SearchPageState extends State<SearchPage> {
                           child: Padding(
                             padding: EdgeInsets.all(2),
                             child: TextField(
+                              onChanged: (value) {
+                                searchPlace(value);
+                              },
                               focusNode: focusDestination,
                               controller: destinationController,
                               decoration: InputDecoration(
