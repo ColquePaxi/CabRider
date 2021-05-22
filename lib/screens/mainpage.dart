@@ -1,6 +1,7 @@
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
 import 'package:cab_rider/helpers/helpermethods.dart';
+import 'package:cab_rider/screens/searchpage.dart';
 import 'package:cab_rider/styles/styles.dart';
 import 'package:cab_rider/widgets/brand_divider.dart';
 import 'package:flutter/material.dart';
@@ -211,32 +212,40 @@ class _MainPageState extends State<MainPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 5,
-                            spreadRadius: 0.5,
-                            offset: Offset(0.7, 0.7),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.search,
-                              color: Colors.blueAccent,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SearchPage()));
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 5,
+                              spreadRadius: 0.5,
+                              offset: Offset(0.7, 0.7),
                             ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text('Serach destination'),
                           ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Colors.blueAccent,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text('Serach destination'),
+                            ],
+                          ),
                         ),
                       ),
                     ),
