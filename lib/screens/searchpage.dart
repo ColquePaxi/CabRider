@@ -1,7 +1,11 @@
 import 'package:cab_rider/brand_colors.dart';
+import 'package:cab_rider/datamodels/prediction.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
 import 'package:cab_rider/secrets/globalvariables.dart';
+import 'package:cab_rider/widgets/brand_divider.dart';
+import 'package:cab_rider/widgets/predictiontile.dart';
 import 'package:flutter/material.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:cab_rider/helpers/requesthelper.dart';
 
@@ -37,6 +41,8 @@ class _SearchPageState extends State<SearchPage> {
 
   /// Término - Implamentação do FOCO no campo Destination
 
+  List<Prediction> destinationPredictionList = [];
+
   void searchPlace(String placeName) async {
     if (placeName.length > 1) {
       String url =
@@ -47,7 +53,16 @@ class _SearchPageState extends State<SearchPage> {
       if (response == 'failed') {
         return;
       }
-      print(response);
+
+      if (response['status'] == 'OK') {
+        var predictionJson = response['predictions'];
+        var thisList = (predictionJson as List)
+            .map((e) => Prediction.fromJson(e))
+            .toList();
+        setState(() {
+          destinationPredictionList = thisList;
+        });
+      }
     }
   }
 
@@ -178,6 +193,21 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
           ),
+          (destinationPredictionList.length > 0)
+              ? Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: ListView.separated(
+                      padding: EdgeInsets.all(0),
+                      itemBuilder: (context, index) {
+                        return PredictionTile(
+                            prediction: destinationPredictionList[index]);
+                      },
+                      separatorBuilder: (context, index) => BrandDivider(),
+                      itemCount: destinationPredictionList.length,
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics()),
+                )
+              : Container(),
         ],
       ),
     );
