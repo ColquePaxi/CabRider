@@ -1,9 +1,11 @@
 import 'package:cab_rider/datamodels/address.dart';
+import 'package:cab_rider/datamodels/directiondetails.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
 import 'package:cab_rider/secrets/globalvariables.dart';
 import 'package:cab_rider/helpers/requesthelper.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HelperMethods {
@@ -18,7 +20,7 @@ class HelperMethods {
     }
 
     String url =
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${mapKey}';
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$mapKey';
 
     var response = await RequestHelper.getRequest(url);
 
@@ -31,11 +33,45 @@ class HelperMethods {
       pickupAddress.placeName = placeAddress;
 
       // Para usar esse context aqui, tem que adicionar ele como
-      // parâmetro na findCoordinateAddress acima
+      // par?metro na findCoordinateAddress acima
       Provider.of<AppData>(context, listen: false)
           .updatePickupAddress(pickupAddress);
     }
 
     return placeAddress;
+  }
+
+  static Future<DirectionDetails> getDirectionDetails(
+      LatLng startPosition, LatLng endPosition) async {
+    String url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${startPosition.latitude},${startPosition.longitude}&destination=${endPosition.latitude},${endPosition.longitude}&mode=driving&key=$mapKey';
+
+    var response = await RequestHelper.getRequest(url);
+
+    if (response == 'failed') {
+      return null;
+    }
+
+    // Copiado do web browser
+    // routes[0].legs[0].duration.text
+    // routes[0].legs[0].duration.value
+    // routes[0].legs[0].distance.text
+    // routes[0].legs[0].distance.value
+
+    DirectionDetails directionDetails = DirectionDetails();
+    directionDetails.durationText =
+        response['routes'][0]['legs'][0]['duration']['text'];
+    directionDetails.durationValue =
+        response['routes'][0]['legs'][0]['duration']['value'];
+    directionDetails.distanceText =
+        response['routes'][0]['legs'][0]['distance']['text'];
+    directionDetails.distanceValue =
+        response['routes'][0]['legs'][0]['distance']['value'];
+
+    // routes[0].overview_polyline.points
+    directionDetails.encodedPoints =
+        response['routes'][0]['overview_polyline']['points'];
+
+    return directionDetails;
   }
 }
