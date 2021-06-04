@@ -23,7 +23,7 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   void showSnackBar(String title) {
@@ -38,6 +38,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   double searchSheetHeight = (Platform.isIOS) ? 300 : 275;
+  double rideDetailSheetHeight = 0; // (Platform.isIOS) ? 235 : 260
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
   double mapBottomPadding = 0;
@@ -67,6 +68,16 @@ class _MainPageState extends State<MainPage> {
     target: LatLng(-23.64878, -46.75436),
     zoom: 14.4746,
   );
+
+  void showDetailSheet() async {
+    await getDirection();
+
+    setState(() {
+      searchSheetHeight = 0;
+      rideDetailSheetHeight = (Platform.isAndroid) ? 235 : 260;
+      mapBottomPadding = (Platform.isAndroid) ? 240 : 230;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,152 +204,159 @@ class _MainPageState extends State<MainPage> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: Container(
-              height: searchSheetHeight,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(15),
-                  topRight: Radius.circular(15),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 15,
-                    spreadRadius: 0.5,
-                    offset: Offset(0.7, 0.7),
+            child: AnimatedSize(
+              vsync: this,
+              duration: Duration(microseconds: 150),
+              curve: Curves.easeIn,
+              child: Container(
+                height: searchSheetHeight,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 5,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 15,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7, 0.7),
                     ),
-                    Text(
-                      'Nice to see you',
-                      style: TextStyle(fontSize: 10),
-                    ),
-                    Text(
-                      'Where are you going',
-                      style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        var response = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SearchPage()));
-                        // Essa string 'getDirection' vem l? da predictiontile.dart quando
-                        // sai de l? e devolve para a mainpage esse "par?metro" de forma
-                        // que ele possa ser um "gatilho" para acionar alguma a??o aqui
-                        if (response == 'getDirection') {
-                          await getDirection();
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 5,
-                              spreadRadius: 0.5,
-                              offset: Offset(0.7, 0.7),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search_sharp,
-                                color: Colors.blueAccent,
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        'Nice to see you',
+                        style: TextStyle(fontSize: 10),
+                      ),
+                      Text(
+                        'Where are you going',
+                        style:
+                            TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          var response = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SearchPage()));
+                          // Essa string 'getDirection' vem l? da predictiontile.dart quando
+                          // sai de l? e devolve para a mainpage esse "par?metro" de forma
+                          // que ele possa ser um "gatilho" para acionar alguma a??o aqui
+                          if (response == 'getDirection') {
+                            //await getDirection();
+                            showDetailSheet();
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 5,
+                                spreadRadius: 0.5,
+                                offset: Offset(0.7, 0.7),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text('Serach destination'),
                             ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search_sharp,
+                                  color: Colors.blueAccent,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text('Serach destination'),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 22,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          OMIcons.home,
-                          color: BrandColors.colorDimText,
-                        ),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Foi feito esse teste para ver se o provider está ok
-                            Text(
-                                /*(Provider.of<AppData>(context).pickupAddress !=
-                                    null)
-                                ? Provider.of<AppData>(context)
-                                    .pickupAddress
-                                    .placeName
-                                :*/
-                                'Add Home'),
-                            SizedBox(height: 3),
-                            Text(
-                              'Your residential address',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  color: BrandColors.colorDimText),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    BrandDivider(),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          OMIcons.workOutline,
-                          color: BrandColors.colorDimText,
-                        ),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Add work'),
-                            SizedBox(height: 3),
-                            Text(
-                              'Your office address',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  color: BrandColors.colorDimText),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                      SizedBox(
+                        width: 22,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            OMIcons.home,
+                            color: BrandColors.colorDimText,
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Foi feito esse teste para ver se o provider está ok
+                              Text(
+                                  /*(Provider.of<AppData>(context).pickupAddress !=
+                                      null)
+                                  ? Provider.of<AppData>(context)
+                                      .pickupAddress
+                                      .placeName
+                                  :*/
+                                  'Add Home'),
+                              SizedBox(height: 3),
+                              Text(
+                                'Your residential address',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    color: BrandColors.colorDimText),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      BrandDivider(),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            OMIcons.workOutline,
+                            color: BrandColors.colorDimText,
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Add work'),
+                              SizedBox(height: 3),
+                              Text(
+                                'Your office address',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    color: BrandColors.colorDimText),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -349,101 +367,106 @@ class _MainPageState extends State<MainPage> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 15,
-                      spreadRadius: 0.5,
-                      offset: Offset(0.7, 0.7),
-                    ),
-                  ]),
-              height: 260,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 18),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      width: double.infinity,
-                      color: BrandColors.colorAccent1,
-                      child: Padding(
+            child: AnimatedSize(
+              vsync: this,
+              duration: Duration(microseconds: 150),
+              curve: Curves.easeIn,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 15,
+                        spreadRadius: 0.5,
+                        offset: Offset(0.7, 0.7),
+                      ),
+                    ]),
+                height: rideDetailSheetHeight,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 18),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        width: double.infinity,
+                        color: BrandColors.colorAccent1,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: <Widget>[
+                              Image.asset(
+                                'images/taxi.png',
+                                height: 70,
+                                width: 70,
+                              ),
+                              SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    'Taxi',
+                                    style: TextStyle(
+                                        fontSize: 18, fontFamily: 'Brand-Bold'),
+                                  ),
+                                  Text('14km',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: BrandColors.colorTextLight)),
+                                ],
+                              ),
+                              Expanded(child: Container()),
+                              Text(
+                                '\$13',
+                                style: TextStyle(
+                                    fontSize: 18, fontFamily: 'Brand-Bold'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 22,
+                      ),
+                      Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
                           children: <Widget>[
-                            Image.asset(
-                              'images/taxi.png',
-                              height: 70,
-                              width: 70,
+                            Icon(
+                              FontAwesomeIcons.moneyBillAlt,
+                              size: 18,
+                              color: BrandColors.colorTextLight,
                             ),
-                            SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  'Taxi',
-                                  style: TextStyle(
-                                      fontSize: 18, fontFamily: 'Brand-Bold'),
-                                ),
-                                Text('14km',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: BrandColors.colorTextLight)),
-                              ],
+                            SizedBox(
+                              width: 16,
                             ),
-                            Expanded(child: Container()),
-                            Text(
-                              '\$13',
-                              style: TextStyle(
-                                  fontSize: 18, fontFamily: 'Brand-Bold'),
+                            Text('Cash'),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: BrandColors.colorTextLight,
+                              size: 16,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 22,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            FontAwesomeIcons.moneyBillAlt,
-                            size: 18,
-                            color: BrandColors.colorTextLight,
-                          ),
-                          SizedBox(
-                            width: 16,
-                          ),
-                          Text('Cash'),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: BrandColors.colorTextLight,
-                            size: 16,
-                          ),
-                        ],
+                      SizedBox(
+                        height: 22,
                       ),
-                    ),
-                    SizedBox(
-                      height: 22,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: TaxiButton(
-                        title: 'REQUEST CAB',
-                        color: BrandColors.colorGreen,
-                        onPressed: () {},
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: TaxiButton(
+                          title: 'REQUEST CAB',
+                          color: BrandColors.colorGreen,
+                          onPressed: () {},
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
