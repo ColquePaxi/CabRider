@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/datamodels/directiondetails.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
@@ -43,6 +44,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   double searchSheetHeight = (Platform.isIOS) ? 300 : 275;
   double rideDetailSheetHeight = 0; // (Platform.isIOS) ? 235 : 260
+  double requestingSheetHeight = 0; // (Platform.isIOS) ? 195 : 220
+
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
   double mapBottomPadding = 0;
@@ -78,6 +81,15 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       rideDetailSheetHeight = (Platform.isAndroid) ? 235 : 260;
       mapBottomPadding = (Platform.isAndroid) ? 240 : 230;
       drawerCanOpen = false;
+    });
+  }
+
+  void showRequestingSheet() {
+    setState(() {
+      rideDetailSheetHeight = 0;
+      requestingSheetHeight = (Platform.isAndroid) ? 195 : 220;
+      mapBottomPadding = (Platform.isAndroid) ? 200 : 190;
+      drawerCanOpen = true;
     });
   }
 
@@ -213,7 +225,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             bottom: 0,
             child: AnimatedSize(
               vsync: this,
-              duration: Duration(microseconds: 150),
+              duration: Duration(milliseconds: 150),
               curve: Curves.easeIn,
               child: Container(
                 height: searchSheetHeight,
@@ -376,7 +388,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             bottom: 0,
             child: AnimatedSize(
               vsync: this,
-              duration: Duration(microseconds: 150),
+              duration: Duration(milliseconds: 150),
               curve: Curves.easeIn,
               child: Container(
                 decoration: BoxDecoration(
@@ -474,7 +486,82 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         child: TaxiButton(
                           title: 'REQUEST CAB',
                           color: BrandColors.colorGreen,
-                          onPressed: () {},
+                          onPressed: () {
+                            showRequestingSheet();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          /// Resquest Sheet
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: AnimatedSize(
+              vsync: this,
+              duration: Duration(milliseconds: 150),
+              curve: Curves.easeIn,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 15,
+                        spreadRadius: 0.5,
+                        offset: Offset(0.7, 0.7),
+                      ),
+                    ]),
+                height: requestingSheetHeight,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextLiquidFill(
+                          loadDuration: Duration(milliseconds: 150),
+                          text: 'Requesting a Ride...',
+                          waveColor: BrandColors.colorTextSemiLight,
+                          boxBackgroundColor: Colors.white,
+                          textStyle: TextStyle(
+                            fontSize: 22,
+                            fontFamily: 'Brand-Bold',
+                            //fontWeight: FontWeight.bold,
+                          ),
+                          boxHeight: 40,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                              width: 1, color: BrandColors.colorLightGrayFair),
+                        ),
+                        child: Icon(Icons.close, size: 25),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        child: Text(
+                          'Cancel ride',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12),
                         ),
                       ),
                     ],
