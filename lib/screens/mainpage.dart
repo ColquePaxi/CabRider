@@ -42,6 +42,8 @@ class _MainPageState extends State<MainPage> {
 
   List<LatLng> polyLineCoordinates = [];
   Set<Polyline> _polylines = {};
+  Set<Marker> _markers = {};
+  Set<Circle> _circles = {};
 
   var geoLocator = Geolocator();
   Position currentPosition;
@@ -138,6 +140,10 @@ class _MainPageState extends State<MainPage> {
             zoomControlsEnabled: true,
             // aplica o tracado do mapa aqui
             polylines: _polylines,
+            // Aplica as marcas e círculos no mapa
+            markers: _markers,
+            circles: _circles,
+
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
               mapController = controller;
@@ -404,5 +410,48 @@ class _MainPageState extends State<MainPage> {
     }
 
     mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
+
+    Marker pickupMarker = Marker(
+      markerId: MarkerId('pickup'),
+      position: pickLatLng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      infoWindow: InfoWindow(title: pickup.placeName, snippet: 'My Location'),
+    );
+
+    Marker destinationMarker = Marker(
+      markerId: MarkerId('destination'),
+      position: destLatLng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      infoWindow:
+          InfoWindow(title: destination.placeName, snippet: 'Destination'),
+    );
+
+    setState(() {
+      _markers.add(pickupMarker);
+      _markers.add(destinationMarker);
+    });
+
+    Circle pickupCircle = Circle(
+      circleId: CircleId('pickup'),
+      strokeColor: Colors.green,
+      strokeWidth: 3,
+      radius: 12,
+      center: pickLatLng,
+      fillColor: BrandColors.colorGreen,
+    );
+
+    Circle destinationCircle = Circle(
+      circleId: CircleId('destination'),
+      strokeColor: BrandColors.colorAccentPurple,
+      strokeWidth: 3,
+      radius: 12,
+      center: pickLatLng,
+      fillColor: BrandColors.colorAccentPurple,
+    );
+
+    setState(() {
+      _circles.add(pickupCircle);
+      _circles.add(destinationCircle);
+    });
   }
 }
