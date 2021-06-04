@@ -1,4 +1,5 @@
 import 'package:cab_rider/brand_colors.dart';
+import 'package:cab_rider/datamodels/directiondetails.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
 import 'package:cab_rider/helpers/helpermethods.dart';
 import 'package:cab_rider/screens/searchpage.dart';
@@ -25,6 +26,8 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+  DirectionDetails tripDirectionDetails;
 
   void showSnackBar(String title) {
     final snackbar = SnackBar(
@@ -411,7 +414,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                                     style: TextStyle(
                                         fontSize: 18, fontFamily: 'Brand-Bold'),
                                   ),
-                                  Text('14km',
+                                  Text(
+                                      (tripDirectionDetails != null)
+                                          ? tripDirectionDetails.distanceText
+                                          : '',
                                       style: TextStyle(
                                           fontSize: 16,
                                           color: BrandColors.colorTextLight)),
@@ -419,7 +425,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                               ),
                               Expanded(child: Container()),
                               Text(
-                                '\$13',
+                                (tripDirectionDetails != null)
+                                    ? '\$${HelperMethods.estimateFares(tripDirectionDetails)}'
+                                    : '',
                                 style: TextStyle(
                                     fontSize: 18, fontFamily: 'Brand-Bold'),
                               ),
@@ -491,6 +499,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     var thisDetails =
         await HelperMethods.getDirectionDetails(pickLatLng, destLatLng);
+
+    setState(() {
+      tripDirectionDetails = thisDetails;
+    });
 
     // Sair do Dialog e voltar para o contexto anteiror
     Navigator.pop(context);

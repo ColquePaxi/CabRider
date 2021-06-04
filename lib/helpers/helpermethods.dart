@@ -74,4 +74,21 @@ class HelperMethods {
 
     return directionDetails;
   }
+
+  static int estimateFares(DirectionDetails details) {
+    // per km = $ 0.3
+    // per minute = $ 0.2
+    // base fare = $ 3.0
+
+    // Base fare
+    double baseFare = 3;
+    // Per km
+    double distanceFare = (details.distanceValue / 1000) * 0.3;
+    // Per minute
+    double timeFare = (details.distanceValue / 60) * 0.2;
+
+    double totalFare = baseFare + distanceFare + timeFare;
+
+    return totalFare.truncate();
+  }
 }
